@@ -1,0 +1,15 @@
+version: '2.2'
+
+services:
+  delores:
+    container_name: rap2-dolores
+    build: .
+    # build from images
+    # image rynxiao/rap2-dolores-nodejs
+    working_dir: /home/rap2-dolores
+    environment:
+      - NODE_ENV=production
+    command: /bin/sh -c 'http-server ./build -s -p 8081'
+    privileged: true
+    ports:
+      - "38081:8081"
