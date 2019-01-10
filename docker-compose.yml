@@ -1,0 +1,57 @@
+version: '2.2'
+
+services:
+  web:
+    container_name: rap2-dolores
+    restart: always
+    image: rynxiao/rap2:1.0.0
+    build: .
+    ports:
+      - "38081:80"
+    command: /bin/sh -c "nginx -g 'daemon off;'"
+
+  delos:
+    container_name: rap2-delos
+    image: blackdog1987/rap2-delos:1.0.0
+    environment:
+      - MYSQL_URL=rap2-mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWD=
+      - MYSQL_SCHEMA=rap2
+
+      # redis config
+      - REDIS_URL=rap2-redis
+      - REDIS_PORT=6379
+
+      # production / development
+      - NODE_ENV=production
+    working_dir: /app
+    privileged: true
+    command: /bin/sh -c 'sleep 30; node scripts/init; node dispatch.js'
+    links:
+      - redis
+      - mysql
+    depends_on:
+      - redis
+      - mysql
+    ports:
+      - "38080:8080"
+
+  redis:
+    container_name: rap2-redis
+    image: redis:4.0.9
+
+  mysql:
+    container_name: rap2-mysql
+    image: mysql:5.7.22
+    ports:
+      - 33306:3306
+    volumes:
+      - "./docker/mysql/volume:/var/lib/mysql"
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --init-connect='SET NAMES utf8mb4;' --innodb-flush-log-at-trx-commit=0
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_DATABASE: "rap2"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: ""
