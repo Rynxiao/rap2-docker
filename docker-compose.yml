@@ -4,8 +4,8 @@ services:
   web:
     container_name: rap2-dolores
     restart: always
-    image: rynxiao/rap2:1.0.0
-    build: .
+    image: rynxiao/rap2:1.0.1
+    # build: .
     ports:
       - "38081:80"
     command: /bin/sh -c "nginx -g 'daemon off;'"
